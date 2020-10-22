@@ -21,9 +21,8 @@ const AspEnvVariableName = "ASPNETCORE_PORT"
 
 type NewsTweet struct {
 	Source string `json:"source"`
-	Title string `json:"title"`
-	Link string `json:"link"`
-
+	Title  string `json:"title"`
+	Link   string `json:"link"`
 }
 
 func main() {
@@ -38,7 +37,7 @@ func main() {
 		port = os.Getenv(AspEnvVariableName)
 	}
 
-	server := http.ListenAndServe(":" + port, r)
+	server := http.ListenAndServe(":"+port, r)
 
 	log.Fatal(server)
 
@@ -90,15 +89,28 @@ func TweetHandler(w http.ResponseWriter, r *http.Request) {
 	createdAt := tweet.CreatedAt
 	fmt.Fprintf(w, "Tweet succesful %s - %s", resp.Status, createdAt)
 
-
 }
 
 func buildTweet(tweet NewsTweet) string {
 
+	source := FormatSourceName(tweet)
+
 	return fmt.Sprintf("%s\n%s\n#%s %s",
 		strings.ToUpper(tweet.Source),
 		tweet.Title,
-		strings.ReplaceAll(tweet.Source," ", ""),
+		source,
 		tweet.Link)
 
+}
+
+func FormatSourceName(tweet NewsTweet) string {
+
+	source := ""
+
+	if strings.ContainsAny(tweet.Source, "-") {
+		source = strings.ReplaceAll(tweet.Source, "-", "")
+	} else {
+		source = strings.ReplaceAll(tweet.Source, " ", "")
+	}
+	return source
 }
